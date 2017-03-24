@@ -494,6 +494,10 @@ input.radio + label:before {
             var isChecked = $(this).is(':checked');
             showIcon(isChecked, $(".angry"), $("#angrytitle"));
         });
+        $('#shockbox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".shock"), $("#shocktitle"));
+        });
 
         $(".reaction-value-input").each(function() {
             $(this).change(function() {
@@ -509,6 +513,12 @@ input.radio + label:before {
 
 
      function refreshLiveContent() {
+        $('.likes').find('.text').text($('#liketitle').val());
+        $('.happy').find('.text').text($('#happytitle').val());
+        $('.sad').find('.text').text($('#sadtitle').val());
+        $('.fml').find('.text').text($('#fmltitle').val());
+        $('.angry').find('.text').text($('#angrytitle').val());
+        $('.shock').find('.text').text($('#shocktitle').val());
 
         videoId = $("#videoId").val();
         console.log(videoId);
