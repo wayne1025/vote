@@ -1,0 +1,620 @@
+<!-- CONFIG - by Wayne
+1/ 更新背景
+2/ 換上LOGO
+3/ 更新TITLE
+4/ 更新粉絲團access token
+5/ 更新文章ID
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+    <meta http-equiv="content-language" content="zh-Hant-TW">
+	<title>FB議題票選</title>
+    <script src="jquery.min.js"></script>
+    <script src="lodash.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- fancybox -->
+    <link rel="stylesheet" type="text/css" href="http://fancyapps.com/fancybox/source/jquery.fancybox.css">
+    <script type="text/javascript" src="http://fancyapps.com/fancybox/source/jquery.fancybox.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tinyColorPicker/1.1.1/jqColorPicker.min.js"></script>
+	<style>
+        html {
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+          margin:0;
+          padding:0;
+          /*background: url("http://s.nownews.com/a9/4b/a94bfeb8a19643484503423bc0719427.jpg") no-repeat center fixed; */
+          /* 在這更換背景 */
+          -webkit-background-size: cover;
+          background-size: cover;
+        }
+		*, *:before, *:after {
+		  box-sizing: inherit;
+		}
+		body{
+			margin: 0;
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3)
+		}
+        header {
+            text-align: center;
+        }
+        header .logo {
+            position: relative;
+            margin:100px auto 20px;
+            width:250px;
+        }
+        h1 {
+            text-align: center;
+            width:100%;
+            font-size: 50px;
+            padding: 30px 0;
+            margin:0;
+            color:#fff;
+        }
+		#wrap{
+			position: relative;
+			margin: 0px auto;
+			width: 1280px;
+			height: 720px;
+		}
+        .tc {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .wf {
+            width: 28%;
+        }
+        .wf img.illu {
+            width:80%;
+            display: block;
+            margin: 20px auto;
+            position: relative;
+        }
+        .wf img.emoji  {
+            width:34px;
+            display: inline-block;
+            margin-right:20px;
+        }
+        .wf {
+            width: 20%;
+            float:left;
+            margin:30px 2%;
+            border:solid 1px #eee;
+            background:#fff;
+            border-radius: 8px;
+            position: relative;
+            text-align: center;
+        }
+
+        /* hide so it doesnt show on page  */
+        #popup-box {
+          display: none;
+          padding: 0 20px;
+          width: 800px;
+        }
+        /* some styling */
+        form { padding: 20px 0; }
+
+        p { text-align: center; font-family: arial; }
+
+        button {
+          color: #FFF;
+          background-color: #000;
+          border: 0;
+          padding: 10px;
+          margin-top: 10px;
+        }
+
+        button:hover {
+          color: #88c040;
+        }
+
+        input {
+          height: 45px;
+          margin: 5px 0 0 0;
+          padding: 5px;
+        }
+
+        .likes {
+            display: none;
+        }
+        .happy {
+            display: none;
+        }
+        .sad {
+            display: none;
+        }
+        .fml {
+            display: none;
+        }
+        .angry {
+            display: none;
+        }
+        .shock {
+            display: none;
+        }
+        .switch {
+  height: 4.4rem;
+  overflow: hidden;
+  width: 7rem;
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.switch .switch-label {
+  width: 100%;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #999;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+input.toggle {
+  visibility: hidden;
+}
+input.toggle + label {
+  width: 4rem;
+  border-radius: 4rem;
+  visibility: visible;
+}
+input.toggle + label:hover {
+  cursor: pointer;
+}
+input.toggle:disabled + label:before {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+input.toggle:disabled + label:before.dark, .dark input.toggle:disabled + label:before {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+input.toggle:disabled + label:after {
+  background-color: #F5F5F5;
+  box-shadow: 0 0.1rem 0.1rem 0rem rgba(0, 0, 0, 0.2);
+}
+input.toggle:disabled + label:after.dark, .dark input.toggle:disabled + label:after {
+  background-color: #464646;
+}
+
+input.toggle + label:before,
+input.toggle + label:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  content: "";
+}
+
+input.toggle + label:before {
+  right: 1rem;
+  left: 0.5rem;
+  top: 0.8rem;
+  bottom: 1.8rem;
+  border-radius: 5rem;
+  transition: background 0.3s;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+input.toggle + label:before.dark, .dark input.toggle + label:before {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+input.toggle + label:after {
+  width: 3rem;
+  height: 3rem;
+  top: 0.2rem;
+  left: 0.3rem;
+  background-color: #fff;
+  border-radius: 100%;
+  box-shadow: 0 0.1rem 0.25rem 0rem rgba(0, 0, 0, 0.3);
+  -webkit-transition: all 0.3s cubic-bezier(0.915, 0.01, 0.075, 0.995);
+  -moz-transition: all 0.3s cubic-bezier(0.915, 0.01, 0.075, 0.995);
+  -o-transition: all 0.3s cubic-bezier(0.915, 0.01, 0.075, 0.995);
+  transition: all 0.3s cubic-bezier(0.915, 0.01, 0.075, 0.995);
+}
+input.toggle + label:after.dark, .dark input.toggle + label:after {
+  background-color: #b4b4b4;
+}
+
+input.toggle:checked + label:before {
+  background-color: #4abc90;
+  opacity: 0.5;
+}
+
+input.toggle:checked + label:after {
+  background-color: #4abc90;
+  margin-left: 3rem;
+  box-shadow: none;
+}
+
+input.checkbox,
+input.radio {
+  display: none;
+}
+
+input.checkbox + label,
+input.radio + label {
+  display: inline-block;
+  line-height: 1.7;
+  position: relative;
+  padding: calc(1.8rem - 1.8rem * 0.54) 0 0.5rem calc(1.8rem + 1rem);
+  min-height: 1.8rem;
+}
+input.checkbox + label:hover,
+input.radio + label:hover {
+  cursor: pointer;
+}
+
+input.checkbox + label:before,
+input.radio + label:before {
+  content: "";
+  height: 1.8rem;
+  width: 1.8rem;
+  position: absolute;
+  left: 0.2rem;
+  top: 0.7rem;
+  background-repeat: no-repeat;
+}
+
+input.radio[disabled] + label:before,
+input.checkbox[disabled] + label:before {
+  opacity: 0.5;
+}
+
+input.radio[disabled] + label,
+input.checkbox[disabled] + label {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+input.checkbox:checked + label:before {
+  background: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHBhdGggZmlsbD0iIzRBQkI4RiIgZD0iTTIwLDI0SDRjLTIuMiwwLTQtMS44LTQtNFY0YzAtMi4yLDEuOC00LDQtNGgxNmMyLjIsMCw0LDEuOCw0LDR2MTZDMjQsMjIuMiwyMi4yLDI0LDIwLDI0eiIvPgo8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMjAuNiw1LjdjLTAuNS0wLjUtMS4zLTAuNS0xLjgsMEw5LDE1LjVsLTIuNC0zLjJjLTAuNC0wLjYtMS4zLTAuNy0xLjgtMC4yaDBjLTAuNiwwLjQtMC43LDEuMy0wLjIsMS44CglsMy4zLDQuM2MwLjEsMC4yLDAuMywwLjMsMC41LDAuNGMwLDAsMCwwLDAsMGMwLjEsMCwwLjEsMCwwLjIsMC4xYzAsMCwwLDAsMC4xLDBjMCwwLDAuMSwwLDAuMSwwYzAsMCwwLjEsMCwwLjEsMGMwLDAsMC4xLDAsMC4xLDAKCWMwLjEsMCwwLjEsMCwwLjIsMGMwLDAsMCwwLDAuMSwwYzAuMSwwLDAuMSwwLDAuMi0wLjFjMCwwLDAsMCwwLDBjMC4xLTAuMSwwLjMtMC4xLDAuNC0wLjJMMjAuNiw3LjVDMjEuMSw3LDIxLjEsNi4yLDIwLjYsNS43eiIvPgo8L3N2Zz4=);
+}
+
+input.checkbox + label:before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8ZyBvcGFjaXR5PSIwLjQ4Ij4KCQk8cGF0aCBmaWxsPSIjQkJCREJGIiBkPSJNMjAsMEg0QzEuOCwwLDAsMS44LDAsNHYxNmMwLDIuMiwxLjgsNCw0LDRoMTZjMi4yLDAsNC0xLjgsNC00VjRDMjQsMS44LDIyLjIsMCwyMCwweiBNMjEsMTkKCQkJYzAsMS4xLTAuOSwyLTIsMkg1Yy0xLjEsMC0yLTAuOS0yLTJWNWMwLTEuMSwwLjktMiwyLTJoMTRjMS4xLDAsMiwwLjksMiwyVjE5eiIvPgoJPC9nPgo8L2c+Cjwvc3ZnPg==);
+}
+
+input.radio:checked + label:before {
+  background: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBvcGFjaXR5PSIwLjQ4IiBmaWxsPSIjMkE5OTc3IiBkPSJNMTIsMEM1LjQsMCwwLDUuNCwwLDEyYzAsNi42LDUuNCwxMiwxMiwxMnMxMi01LjQsMTItMTJDMjQsNS40LDE4LjYsMCwxMiwweiBNMTIsMjIKCQlDNi41LDIyLDIsMTcuNSwyLDEyQzIsNi41LDYuNSwyLDEyLDJzMTAsNC41LDEwLDEwQzIyLDE3LjUsMTcuNSwyMiwxMiwyMnoiLz4KPC9nPgo8Y2lyY2xlIGZpbGw9IiM0QUJCOEYiIGN4PSIxMiIgY3k9IjEyIiByPSI4Ii8+Cjwvc3ZnPg==);
+}
+
+input.radio + label:before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGNpcmNsZSBvcGFjaXR5PSIwLjQ4IiBmaWxsPSIjQkJCREJGIiBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz4KPC9zdmc+);
+}
+
+.cp-color-picker{
+    z-index:9999;
+}
+
+.form-group{
+    display: inline-block;
+}
+
+	</style>
+</head>
+<body id="live-background">
+    <header>
+        <img class="logo" src="https://avatars1.githubusercontent.com/u/15151904?v=3&s=200"> <!-- 更換LOGO -->
+        <h1 id="live-title">直播使用標題</h1> <!-- 更換投票標題 -->
+    </header>
+    <section>
+        <a href="#popup-box" id="pop" class="fancybox" rel="group"></a>
+        <div id="popup-box">
+        <!-- 控制區塊 -->
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="videoId" class="col-md-2 control-label">影片ID</label>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" id="videoId" placeholder="輸入您直播的影片ID（這裡放的是那串數字）ex: 1067602630023589" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="refreshTimer" class="col-md-2 control-label">更新頻率（秒）</label>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" id="refreshTimer" value="5">
+                </div>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="title" class="col-md-2 control-label">標題</label>
+                <div class="col-md-7">
+                    <input type="text" class="form-control reaction-value-input" id="title" placeholder="輸入您的標題" value="你覺得哪個洗洗睡好嗎？">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label"><div class="color" style="float:left;width:15px;height:15px;margin-top:5px;background:#000"></div>標題顏色</label>
+                <div class="col-md-2"><input type="text" id="title-color" class="form-control reaction-value-input" value="#000000"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">標題大小</label>
+                <div class="col-md-2"><input type="text" id="title-size" class="form-control reaction-value-input" value="50"></div>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="backgroundImage" class="col-md-2 control-label">LOGO</label>
+                <div class="col-md-7">
+                    <input type="text" class="form-control reaction-value-input" id="logoImage" value="http://iphoto.ipeen.com.tw/photo/comment/144431/576384/cgm4e81fb9757680b3548db5728edf910cc482.jpg">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="backgroundImage" class="col-md-2 control-label">背景圖片</label>
+                <div class="col-md-7">
+                    <input type="text" class="form-control reaction-value-input" id="backgroundImage" value="http://iphoto.ipeen.com.tw/photo/comment/144431/576384/cgm4e81fb9757680b3548db5728edf910cc482.jpg">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="likebox" id="likebox" /><label for="likebox" class="col-md-2 control-label"><img class="emoji" src="emojis/like.png" width="15px">顯示讚</label>
+                <input type="text" class="form-control reaction-value-input" id="liketitle" placeholder="輸入您的標題" value="讚">
+
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="happybox" id="happybox" /><label for="happybox" class="col-md-2 control-label"><img class="emoji" src="emojis/love.png" width="15px">顯示愛心</label>
+                <input type="text" class="form-control reaction-value-input" id="happytitle" placeholder="輸入您的標題" value="愛心">
+                <br>
+
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="sadbox" id="sadbox" /><label for="sadbox" class="col-md-2 control-label"><img class="emoji" src="emojis/sad.png" width="15px">顯示哭臉</label>
+                <input type="text" class="form-control reaction-value-input" id="sadtitle" placeholder="輸入您的標題" value="哭臉">
+
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="fmlbox" id="fmlbox" /><label for="fmlbox" class="col-md-2 control-label"><img class="emoji" src="emojis/haha.png" width="15px">顯示笑臉</label>
+                <input type="text" class="form-control reaction-value-input" id="fmltitle" placeholder="輸入您的標題" value="笑臉">
+                <br>
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="angrybox" id="angrybox" /><label for="angrybox" class="col-md-2 control-label"><img class="emoji" src="emojis/angry.png" width="15px">顯示生氣</label>
+                <input type="text" class="form-control reaction-value-input" id="angrytitle" placeholder="輸入您的標題" value="生氣">
+
+                <input type="checkbox" class="checkbox form-control reaction-value-input" name="shockbox" id="shockbox" /><label for="shockbox" class="col-md-2 control-label"><img class="emoji" src="emojis/shock.png" width="15px">顯示驚訝</label>
+                <input type="text" class="form-control reaction-value-input" id="shocktitle" placeholder="輸入您的標題" value="驚訝">
+            </div>
+            <br>
+            <div class="form-group">
+                <label class="col-md-2 control-label">寬寬大小</label>
+                <div class="col-md-2"><input type="text" id="box-size" class="form-control reaction-value-input" value="28"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">讚數大小</label>
+                <div class="col-md-2"><input type="text" id="counter-size" class="form-control reaction-value-input" value="50"></div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-2">
+                    <button type="button" id="clickButton" class="btn btn-default" onclick="startApplication()">開始</button>
+                </div>
+            </div>
+
+
+
+        </form>
+        </div>
+
+    </section>
+    <!-- REACTIONS -->
+	<div class="tc wf ui-widget-content  likes"><span class="text"></span><img class="emoji" src="emojis/like.png"><span class="counter"></span></div>
+    <div class="tc wf ui-widget-content happy"><span class="text"></span><img class="emoji" src="emojis/love.png"><span class="counter"></span></div>
+    <div class="tc wf ui-widget-content sad"><span class="text"></span><img class="emoji" src="emojis/sad.png"><span class="counter"></span></div>
+    <div class="tc wf ui-widget-content fml"><span class="text"></span><img class="emoji" src="emojis/haha.png"><span class="counter"></span></div>
+    <div class="tc wf ui-widget-content angry"><span class="text"></span><img class="emoji" src="emojis/angry.png"><span class="counter"></span></div>
+    <div class="tc wf ui-widget-content shock"><span class="text"></span><img class="emoji" src="emojis/shock.png"><span class="counter"></span></div>
+
+
+    <script>
+    "use strict";
+    var access_token = '132863386747341|TQ6gBA9E40cop1BjDhTCp4fE9wQ'; // 粉絲團應用 ACCESS TOKEN
+    var postID = '10154720402987663'; // 貼上貼文的ID
+    var refreshTimer; // 幾秒更新一次
+    var defaultCount = 0; // 從0開始計算
+    var videoId;
+
+
+    var reactions = ['LIKE', 'LOVE', 'WOW', 'HAHA', 'SAD', 'ANGRY'].map(function (e) {
+        var code = 'reactions_' + e.toLowerCase();
+        return 'reactions.type(' + e + ').limit(0).summary(total_count).as(' + code + ')'
+    }).join(',');
+
+    var	v1 = $('.likes .counter'),
+    	v2 = $('.happy .counter'),
+        v3 = $('.sad .counter'),
+        v4 = $('.fml .counter'),
+        v5 = $('.angry .counter'),
+        v6 = $('.shock .counter');
+
+    function refreshCounts() {
+        var url = 'https://graph.facebook.com/v2.8/102884532662_' + videoId  + '?fields=' + reactions + '&access_token=' + access_token;
+    	$.getJSON(url, function(res){
+    		v1.text(defaultCount + res.reactions_like.summary.total_count);
+    		v2.text(defaultCount + res.reactions_love.summary.total_count);
+            v3.text(defaultCount + res.reactions_sad.summary.total_count);
+            v4.text(defaultCount + res.reactions_haha.summary.total_count);
+            v5.text(defaultCount + res.reactions_angry.summary.total_count);
+            v6.text(defaultCount + res.reactions_wow.summary.total_count);
+    	});
+    }
+    $(".tc, .logo, #live-title").draggable();
+    $(".wf").resizable({
+      animate: true
+    });
+
+
+    $(document).ready(function() {
+
+        $("#live-title").click(function(){
+            $(".fancybox").eq(0).trigger('click');
+        });
+         setTimeout(function() {
+            $(".fancybox").eq(0).trigger('click');
+         }, 500);
+
+         $(".fancybox")
+        .attr('rel', 'group')
+        .fancybox({
+             padding: 0,
+             autoScale: true,
+             scrolling: 'auto'
+        });
+
+        function showIcon(isChecked, $target, $source){
+            if (isChecked) {
+                $target.show();
+                $target.find('.text').text( $source.val() );
+                return;
+            }
+            $target.hide();
+            $target.find('.text').text();
+        }
+
+        $('#likebox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".likes"), $("#liketitle"));
+        });
+        $('#happybox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".happy"), $("#happytitle"));
+        });
+        $('#sadbox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".sad"), $("#sadtitle"));
+        });
+        $('#fmlbox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".fml"), $("#fmltitle"));
+        });
+        $('#angrybox').click(function() {
+            var isChecked = $(this).is(':checked');
+            showIcon(isChecked, $(".angry"), $("#angrytitle"));
+        });
+
+        $(".reaction-value-input").each(function() {
+            $(this).change(function() {
+                refreshLiveContent();
+            });
+        });
+
+     });
+
+    $("#clickButton").attr("onclick", "startApplication()");
+
+     //即時更新使用
+
+
+     function refreshLiveContent() {
+
+        videoId = $("#videoId").val();
+        console.log(videoId);
+        refreshTimer = $("#refreshTimer").val();
+        $('.logo').attr('src',  $('#logoImage').val());
+        $("#live-title").html($("#title").val());
+        $("#live-title").css({
+            "color": '"'+$("#title-color").val()+'"'
+        });
+        $("#live-title").css({
+            "font-size": $("#title-size").val()+"px",
+        });
+        $("#live-background").css({
+        "background-image": "url("+$("#backgroundImage").val()+")",
+        "background-repeat": "no-repeat",
+        "background-position": "center center"
+        });
+
+        $(".wf").css({
+            "width": $("#box-size").val()+"%",
+        });
+        setInterval(function(){
+            console.log(refreshTimer)
+            refreshCounts();
+        }, refreshTimer * 1000);
+
+        refreshCounts();
+
+     }
+
+    function startApplication() {
+
+        videoId = $("#videoId").val();
+        refreshTimer = $("#refreshTimer").val();
+        $("#live-title").html($("#title").val());
+        $("#live-title").css({
+            "color": '"'+$("#title-color").val()+'"'
+        });
+        $('.logo').attr('src',  $('#logoImage').val());
+        $("#live-background").css({
+        "background-image": "url("+$("#backgroundImage").val()+")",
+        "background-repeat": "no-repeat",
+        "background-position": "center center"
+        });
+
+        $(".counter").css({
+            "font-size": $("#counter-size").val()+"px",
+        });
+        $("#live-title").css({
+            "font-size": $("#title-size").val()+"px",
+        });
+        $(".wf").css({
+            "width": $("#box-size").val()+"%",
+        });
+
+        $(".fancybox-close").trigger('click');
+        setInterval(function(){
+            console.log(refreshTimer)
+            refreshCounts();
+        }, refreshTimer * 1000);
+
+        refreshCounts();
+
+        console.log(refreshTimer);
+    }
+
+
+
+    //log專用
+    function log() {
+      setTimeout(console.log.bind(console, "%c你媽有說不要亂開console嗎", "background: #fff;color:red;padding:5px;border-radius: 5px;line-height: 26px;font-size:50px;font-weight:bold", ""));
+      setTimeout(console.log.bind(console, '\n'));
+      console.log("1");
+    }
+
+    document.querySelector("input").addEventListener("click", function() {
+        log();
+    });
+
+    log();
+
+    </script>
+    <script type="text/javascript">
+    (function(d, s, id){
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) {return;}
+js = d.createElement(s); js.id = id;
+js.src = "http://connect.facebook.net/en_US/sdk.js";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+    $('.color').colorPicker({
+      renderCallback: function($elm, toggled) {
+
+        // The whole color object.
+        var colors = this.color.colors;
+
+        // Hex color.
+        var hex = colors.HEX;
+
+        // Update button color.
+        // $( '.btn-update-map' ).css( 'background', '#' + hex );
+        // $( '.btn-close-cp' ).css( 'background', '#' + hex );
+        $('.color').css('color', '#' + hex);
+        $('#title-color').val('#'+hex);
+      }
+    }); // that's it
+    </script>
+</body>
+</html>
