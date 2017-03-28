@@ -496,6 +496,14 @@
             v4.text(defaultCount + res.reactions_haha.summary.total_count);
             v5.text(defaultCount + res.reactions_angry.summary.total_count);
             v6.text(defaultCount + res.reactions_wow.summary.total_count);
+        }).fail(function() {
+            v1.text('');
+            v2.text('');
+            v3.text('');
+            v4.text('');
+            v5.text('');
+            v6.text('');
+            console.log( "error" );
         });
     }
     $(".tc, .logo, #live-title").draggable();
