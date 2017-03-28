@@ -599,6 +599,8 @@
         });
         setInterval(function() {
             console.log(refreshTimer)
+            videoId = $("#videoId").val();
+            console.log(videoId,'L603 id number')
             refreshCounts();
         }, refreshTimer * 1000);
 
